@@ -1,2 +1,0 @@
-List page urls to be fetched should be in a distribtable location, such as Mysql database, or elasticsearch index. Currently they sit at local driver.
-

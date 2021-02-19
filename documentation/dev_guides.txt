@@ -1,1 +1,0 @@
-1 每次新增站点解析，完成开发后，都应该更新 crawler/crawler_sys/framework/platform_crawler_register.py 文件，并且在整个爬虫系统内，都应该保持使用与这个文件中platform_crawler_reg.keys里一致的站点名称
