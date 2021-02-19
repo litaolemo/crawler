@@ -1,0 +1,53 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=hanye
+HOME=/
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+
+# 1 update video data in target release index daily
+  0  0  *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/update_data_in_target_releasers_multi_process.py -p toutiao -n 10 -s 10
+  0  0  *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/update_data_in_target_releasers_multi_process.py -p 腾讯视频 -n 30 -s 10
+  0  0  *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/update_data_in_target_releasers_multi_process.py -p iqiyi -n 30 -s 10
+  0  0  *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/update_data_in_target_releasers_multi_process.py -p new_tudou -n 10 -s 10
+
+# 2 write crawled data into short-video-prodtion index daily
+  0  05 *  *  *  hanye python3 /home/hanye/crawlers/tasks/update_DU_ATU_from_crawler_raw.py
+
+# 3 create redis url batch
+  0  18 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/scheduler/generate_redis_url_batch.py  -p iqiyi -p 腾讯视频 -b 02 -d 30
+  0  10 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/scheduler/generate_redis_url_batch.py  -p iqiyi -p 腾讯视频 -b 02 -d 30
+
+# 4 scrap redis url list
+  0  03 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/scrap_redis_urls.py -p 腾讯视频 -b 02
+  0  03 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/scrap_redis_urls.py -p iqiyi -b 02
+  0  03 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/scrap_list_pages.py -p youku -n 30
+
+# 5 scrap list pages
+  0  10 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/scrap_list_pages_multi_process.py -p iqiyi -n 30
+  0  10 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/scrap_list_pages_multi_process.py -p youku -n 30
+  0  10 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/scrap_list_pages_multi_process.py -p 腾讯视频 -n 30
+  0 7,10,15 *  *  *  hanye python3 /home/hanye/crawlers/crawler_sys/framework/scrap_list_pages_multi_process.py -p toutiao -n 160 -s 10
+
+# update haokan target releaser
+  0 0,8,12,18 * * * hanye python3 /home/hanye/crawlers/crawler_sys/framework/update_data_in_target_releasers_single_thread.py -p haokan -n 20
+
+# get tencent news search page
+  0 0,4,8,10,14,16,20 * * *  hanye python3 /home/hanye/crawlersNew/crawler/crawler_sys/framework/search_page_single_process.py -p 腾讯新闻
+
+#high frequency releasers ,crawler executes every hour, only for haokan currently
+ 0 0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22 * * *  hanye python3 /home/hanye/crawlersNew/crawler/crawler_sys/framework/high_fre_releasers.py -p haokan
+
+#high frequency releasers. execute on 1 pm and 6pm
+ 0 0,13,18 * * *  hanye python3 /home/hanye/crawlersNew/crawler/crawler_sys/framework/update_data_in_target_releasers_multi_process.py -p toutiao -fre 3 -n 20 -s 15
+ 0 0,13,18 * * *  hanye python3 /home/hanye/crawlersNew/crawler/crawler_sys/framework/update_data_in_target_releasers_multi_process.py -p 腾讯视频  -fre 3 -n 20 -s 15
+ 0 0,13,18 * * *  hanye python3 /home/hanye/crawlersNew/crawler/crawler_sys/framework/update_data_in_target_releasers_multi_process.py -p new_tudou  -fre 3 -n 20 -s 15

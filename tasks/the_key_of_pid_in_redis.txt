@@ -1,0 +1,3 @@
+[parse_list_page]
+v_qq = v_qq_parse_list_page
+youku = youku_parse_list_page
